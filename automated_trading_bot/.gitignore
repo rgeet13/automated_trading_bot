@@ -1,0 +1,15 @@
+
+
+# Ignore virtual environment
+bot-env/
+
+# Ignore ENV Varialbes
+*.env
+.env
+
+
+
+# Ignore logs and databases
+*.log
+*.sqlite3
+*.db
