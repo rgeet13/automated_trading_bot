@@ -1,4 +1,4 @@
-from creds import redirect_uri, client_id, secret_id, id, pin, TOTP_KEY
+from creds import fyers_client_id ,fyers_secret_id ,fyers_redirect_uri ,fyers_id ,fyers_pin ,fyers_TOTP_KEY
 from fyers_apiv3 import fyersModel
 from datetime import datetime, timedelta, date
 from  time import sleep
@@ -19,12 +19,12 @@ warnings.filterwarnings('ignore')
 import base64
 
 
-redirect_uri = redirect_uri
-client_id= client_id
-secret_key = secret_id
-FY_ID = id  # Your fyers ID
-TOTP_KEY =  TOTP_KEY # TOTP secret is generated when we enable 2Factor TOTP from myaccount portal
-PIN = pin # User pin for fyers account
+redirect_uri = fyers_redirect_uri
+client_id= fyers_client_id
+secret_key = fyers_secret_id
+FY_ID = fyers_id  # Your fyers ID
+TOTP_KEY =  fyers_TOTP_KEY # TOTP secret is generated when we enable 2Factor TOTP from myaccount portal
+PIN = fyers_pin # User pin for fyers account
 
 
 def get_fyers_model():
@@ -130,7 +130,7 @@ def get_fyers_model():
     
     
 # # Make a request to get the user profile information
-# fyers = get_fyers_model()
+fyers = get_fyers_model()
 
 # # Get Profile
 # profile = fyers.get_profile()
