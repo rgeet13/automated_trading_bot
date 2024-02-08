@@ -15,8 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from app.views import HealthCheckView
 
 urlpatterns = [
+    path('', HealthCheckView.as_view({'get': 'list'})),
     path('admin/', admin.site.urls),
     path('api/', include('app.urls')),
 ]

@@ -1,11 +1,11 @@
 import requests
-from login import get_fyers_model
+# from login import get_fyers_model
 
 
 ## Fyers model instance 
-fyers = get_fyers_model()
+# fyers = get_fyers_model()
 
-def place_fyers_order(symbol, qty, order_type, side, product_type, limit_price=0, stop_price=0,
+def place_fyers_order(fyers, symbol, qty, order_type, side, product_type, limit_price=0, stop_price=0,
                       disclosed_qty=0, validity="DAY", offline_order=False, order_tag=None):
     """
     Place an order using the Fyers API.
