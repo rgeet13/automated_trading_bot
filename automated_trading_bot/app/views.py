@@ -72,17 +72,20 @@ class OrderPlacementViewset(ViewSet):
         auth_code = request.data.get("auth_code", None)
         secret_key = request.data.get("secret_key", None)
         symbol = request.data.get("symbol", None)
-        quantity = request.data.get("quantity", None)
+        quantity = request.data.get("qty", None)
         price = request.data.get("price", None)
         order_type = request.data.get("order_type", None)
+        side = request.data.get("side", None)
         
         # Validate app_id and auth_code
-        if not app_id or not auth_code or not secret_key or symbol or order_type:
-            return Response({"error": "app_id, auth_code, secret_key, symbol and order_type is required"}, status=status.HTTP_400_BAD_REQUEST)
+        if not (app_id or auth_code or secret_key or symbol or order_type or side):
+            return Response({"error": "app_id, auth_code, secret_key, symbol, side and order_type are required"}, status=status.HTTP_400_BAD_REQUEST)
         
         # Get fyers model
         try:
-            fyers_model = get_fyers_model(app_id, secret_key, 'http://192.168.1.4:5173/', auth_code)
+            fyers_model = get_fyers_model(app_id, secret_key, 'http://192.168.1.3:5173/', auth_code)
+            if isinstance(fyers_model, dict) and fyers_model['s'] == 'error':
+                return Response(fyers_model, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             print(f"Error in getting fyers model : {e}")
             raise e
@@ -94,7 +97,7 @@ class OrderPlacementViewset(ViewSet):
                 symbol=symbol,
                 qty=quantity, 
                 order_type=order_type, 
-                side=1,
+                side=side,
                 product_type='CNC',
                 )
             return Response(response, status=status.HTTP_201_CREATED)

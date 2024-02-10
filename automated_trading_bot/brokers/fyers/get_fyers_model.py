@@ -24,14 +24,14 @@ def get_fyers_model(client_id, secret_key, redirect_uri, auth_code):
 
     # Generate the access token using the authorization code
     response = session.generate_token()
-
-    # Print the response, which should contain the access token and other details
-    print(response)
-
+    print("RES - ", response)
+    if response['s'] == 'error':
+        return response
+    print(f"Access token : {response['access_token']}")
 
     access_token = response['access_token']
 
-    # Initialize the FyersModel instance with your client_id, access_token, and enable async mode
+    # Initialize the FyersModel instance with your client_id, access_token, and disable async mode
     fyers = fyersModel.FyersModel(client_id=client_id, is_async=False, token=access_token, log_path=os.getcwd())
 
     return fyers
