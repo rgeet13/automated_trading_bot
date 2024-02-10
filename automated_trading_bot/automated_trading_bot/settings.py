@@ -86,16 +86,16 @@ WSGI_APPLICATION = 'automated_trading_bot.wsgi.application'
 #     }
 # }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'trading_platform',
-        'USER': 'trading_platform',
-        'PASSWORD': '12345',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'trading_platform',
+#         'USER': 'trading_platform',
+#         'PASSWORD': '12345',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
 
 
 
