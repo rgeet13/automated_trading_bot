@@ -35,3 +35,28 @@ def get_fyers_model(client_id, secret_key, redirect_uri, auth_code):
     fyers = fyersModel.FyersModel(client_id=client_id, is_async=False, token=access_token, log_path=os.getcwd())
 
     return fyers
+
+def get_refresh_token(client_id, secret_key, redirect_uri, auth_code):
+    """
+    In order to get started with Fyers API we would like you to do the following things first.
+    1. Checkout our API docs :   https://myapi.fyers.in/docsv3
+    2. Create an APP using our API dashboard :   https://myapi.fyers.in/dashboard/
+    """
+    grant_type = "authorization_code"
+    response_type = "code"
+    session = fyersModel.SessionModel(
+        client_id=client_id,
+        secret_key=secret_key, 
+        redirect_uri=redirect_uri, 
+        response_type=response_type, 
+        grant_type=grant_type
+    )
+    session.set_token(auth_code)
+
+    # Generate the access token using the authorization code
+    response = session.generate_token()
+    print("RES - ", response)
+    if response['s'] == 'error':
+        return response
+    
+    return response['refresh_token']

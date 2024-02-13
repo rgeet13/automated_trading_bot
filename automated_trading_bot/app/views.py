@@ -6,7 +6,7 @@ from .scanners.streak import get_scanner_data, get_all_scanners
 from rest_framework.decorators import action
 from .models import AuthCode
 from .serializers import AuthCodeSerializer
-from brokers.fyers.get_fyers_model import get_fyers_model
+from brokers.fyers.get_fyers_model import get_fyers_model, get_refresh_token
 from brokers.fyers.orders import place_fyers_order
 
 
@@ -59,6 +59,17 @@ class AuthCodeViewSet(ModelViewSet):
         # Customize the update method if needed
         return super().update(request, *args, **kwargs)
 
+    @action(detail=False, methods=["POST"])
+    def refresh_token(self, request, *args, **kwargs):
+        try:
+            app_id = request.data.get("app_id", None)
+            auth_code = request.data.get("auth_code", None)
+            secret_key = request.data.get("secret_key", None)
+            refresh_token = get_refresh_token(client_id=app_id, secret_key=secret_key, redirect_uri='http://192.168.1.3:5173/', auth_code=auth_code)
+            return Response({'refresh_token': refresh_token}, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(f"Error in setting refresh token : {e}")
+            raise e
 class OrderPlacementViewset(ViewSet):
 
     def list(self, request, *args, **kwargs):
