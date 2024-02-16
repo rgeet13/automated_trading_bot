@@ -32,9 +32,9 @@ def get_fyers_model(client_id, secret_key, redirect_uri, auth_code):
     access_token = response['access_token']
 
     # Initialize the FyersModel instance with your client_id, access_token, and disable async mode
-    fyers = fyersModel.FyersModel(client_id=client_id, is_async=False, token=access_token, log_path=os.getcwd())
+    
 
-    return fyers
+    return access_token
 
 def get_refresh_token(client_id, secret_key, redirect_uri, auth_code):
     """

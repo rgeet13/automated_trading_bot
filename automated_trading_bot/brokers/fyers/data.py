@@ -1,9 +1,9 @@
-from login import get_fyers_model
+# from login import get_fyers_model
 
 
-fyers = get_fyers_model()
+# fyers = get_fyers_model()
 
-def get_historical_data(symbol, resolution, range_from, range_to, cont_flag):
+def get_historical_data(fyers, symbol, resolution, range_from, range_to, cont_flag):
     """
     Get historical data using the Fyers API.
 
@@ -35,20 +35,22 @@ def get_historical_data(symbol, resolution, range_from, range_to, cont_flag):
     # Return the response
     return response
 
-sbi_data = get_historical_data("NSE:SBIN-EQ", "15", "2024-01-09", "2024-01-11", 0)
-print(sbi_data)
+# sbi_data = get_historical_data("", "NSE:SBIN-EQ", "15", "2024-01-09", "2024-01-11", 0)
+# print(sbi_data)
 
-def get_quotes(symbols):
+def get_quotes(fyers, symbols):
     """
     Get market quotes for one or more symbols using the Fyers API.
 
     Parameters:
+    - fyers (obj): Fyers model object.
     - symbols (str): Comma-separated symbols for which quotes are requested (e.g., "NSE:SBIN-EQ,NSE:IDEA-EQ").
 
     Returns:
     - dict: Dictionary containing market quotes for the provided symbols.
     """
     # Prepare data for the API request
+    print(fyers, type(fyers), "Here's the fyers instance")
     data = {
         "symbols": symbols
     }
@@ -56,7 +58,6 @@ def get_quotes(symbols):
     # Make the API request
     response = fyers.quotes(data=data)
 
-    # Return the response
     return response
 
 # symbols = "NSE:SBIN-EQ"

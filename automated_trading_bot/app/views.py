@@ -1,4 +1,4 @@
-import json
+import json, os
 from rest_framework import status
 from rest_framework.viewsets import ViewSet, ModelViewSet
 from rest_framework.response import Response
@@ -8,6 +8,8 @@ from .models import AuthCode
 from .serializers import AuthCodeSerializer
 from brokers.fyers.get_fyers_model import get_fyers_model, get_refresh_token
 from brokers.fyers.orders import place_fyers_order
+from brokers.fyers.data import get_quotes
+from fyers_apiv3 import fyersModel
 
 
 class HealthCheckView(ViewSet):
@@ -40,36 +42,51 @@ class ScannersDataViewset(ViewSet):
                 
         except Exception as e:
             print(f"Error in getting scanners details data : {e}")
+            raise e
+            
+    @action(detail=False, methods=["POST"])
+    def stock_prices(self, request, *args, **kwargs):
+        try:
+            app_id = request.data.get("app_id", None)
+            auth_code = request.data.get("auth_code", None)
+            secret_key = request.data.get("secret_key", None)
+            symbols = request.data.get("symbols", None)
+            symbols = ",".join([f"{item}-EQ" for item in symbols])
+            fyers = fyersModel.FyersModel(client_id=app_id, is_async=False, token=auth_code, log_path=os.getcwd())
+            if isinstance(fyers, dict) and fyers['s'] == 'error':
+                return Response(fyers, status=status.HTTP_400_BAD_REQUEST)
+            response = get_quotes(fyers, symbols)
 
-class AuthCodeViewSet(ModelViewSet):
-    queryset = AuthCode.objects.all()
-    serializer_class = AuthCodeSerializer
+            return Response({'data': response}, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(f"Error in getting stock prices data : {e}")
+
+
+class AuthCodeViewSet(ViewSet):
 
     def list(self, request, *args, **kwargs):
         # Customize the list method if needed
         return super().list(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        return Response(serializer.data, status=201)
+        try:
+            app_id = request.data.get("app_id", None)
+            auth_code = request.data.get("auth_code", None)
+            secret_key = request.data.get("secret_key", None)
+            redirect_uri = request.data.get("redirect_uri", None)
+            access_token = get_fyers_model(app_id, secret_key, redirect_uri, auth_code)
+            return Response({'access_token': access_token}, status=status.HTTP_202_ACCEPTED)
+        except Exception as e:
+            print(f"Error in setting refresh token : {e}")
+            raise e
 
     def update(self, request, *args, **kwargs):
         # Customize the update method if needed
         return super().update(request, *args, **kwargs)
 
     @action(detail=False, methods=["POST"])
-    def refresh_token(self, request, *args, **kwargs):
-        try:
-            app_id = request.data.get("app_id", None)
-            auth_code = request.data.get("auth_code", None)
-            secret_key = request.data.get("secret_key", None)
-            refresh_token = get_refresh_token(client_id=app_id, secret_key=secret_key, redirect_uri='http://192.168.1.3:5173/', auth_code=auth_code)
-            return Response({'refresh_token': refresh_token}, status=status.HTTP_200_OK)
-        except Exception as e:
-            print(f"Error in setting refresh token : {e}")
-            raise e
+    def access_token(self, request, *args, **kwargs):
+        pass
 class OrderPlacementViewset(ViewSet):
 
     def list(self, request, *args, **kwargs):
@@ -94,9 +111,9 @@ class OrderPlacementViewset(ViewSet):
         
         # Get fyers model
         try:
-            fyers_model = get_fyers_model(app_id, secret_key, 'http://192.168.1.3:5173/', auth_code)
-            if isinstance(fyers_model, dict) and fyers_model['s'] == 'error':
-                return Response(fyers_model, status=status.HTTP_400_BAD_REQUEST)
+            fyers = fyersModel.FyersModel(client_id=app_id, is_async=False, token=auth_code, log_path=os.getcwd())
+            if isinstance(fyers, dict) and fyers['s'] == 'error':
+                return Response(fyers, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             print(f"Error in getting fyers model : {e}")
             raise e
@@ -104,7 +121,7 @@ class OrderPlacementViewset(ViewSet):
         # Place order
         try:
             response = place_fyers_order(
-                fyers=fyers_model,
+                fyers=fyers,
                 symbol=symbol,
                 qty=quantity, 
                 order_type=order_type, 
